@@ -120,15 +120,13 @@ function buildForm(sess) {
   checkReady();
 }
 
-/* Enable Save button only when name entered and inputs exist */
+/* Enable Save button only when inputs exist */
 ctf.addEventListener("input", () => {
   localStorage.setItem("ctf_name", ctf.value);
   checkReady();
 });
 
 saveBt.addEventListener("click", () => {
-  if (!ready()) return alert("Enter your name first.");
-
   const data = inputs.map(([equipName, qtyId, consId]) => {
     const quantity = Number(document.getElementById(qtyId).value) || 0;
     const isConsumable = document.getElementById(consId).checked;
@@ -149,6 +147,9 @@ saveBt.addEventListener("click", () => {
 
 /* Submit all stored responses to Google Sheet */
 submitBt.addEventListener("click", () => {
+  if (!ctf.value.trim()) {
+    return alert("Please enter your name before submitting all responses.");
+  }
   overlay.classList.add("show");
   const rows = [];
 
@@ -182,7 +183,7 @@ submitBt.addEventListener("click", () => {
 
 /* Helpers */
 function checkReady() {
-  saveBt.disabled = !(ctf.value.trim() && inputs.length);
+  saveBt.disabled = inputs.length === 0;
 }
 
 function ready() {
