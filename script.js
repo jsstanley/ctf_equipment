@@ -29,6 +29,19 @@ fetch("session_equipment.json")
     });
     buildForm(current);
 
+    // After buildForm(current);
+    Object.keys(storedResponses).forEach((sessDone) => {
+      const liDone = [...sList.children].find((li) => li.dataset.sess === sessDone);
+      if (liDone) {
+        liDone.classList.add("done");
+      }
+    });
+    // Enable Submit All if all sessions completed
+    const allSessions = Object.keys(equip);
+    if (allSessions.every(s => storedResponses[s])) {
+      submitBt.disabled = false;
+    }
+
     sList.addEventListener("click", (e) => {
       const li = e.target.closest("li");
       if (li && li.dataset.sess) {
@@ -59,18 +72,25 @@ function buildForm(sess) {
   `;
   const tbody = table.querySelector("tbody");
 
-  (equip[sess] || []).forEach(itemObj => {
+  // Retrieve any stored data for this session
+  const savedData = storedResponses[sess] || [];
+
+  (equip[sess] || []).forEach((itemObj) => {
     const { equipment, consumable } = itemObj;
-    const idQty  = "qt_" + btoa(equipment).slice(0, 6);
+    const idQty = "qt_" + btoa(equipment).slice(0, 6);
     const idCons = "cs_" + btoa(equipment).slice(0, 6);
+
+    // Determine previously saved values
+    const found = savedData.find(([e]) => e === equipment) || [equipment, 0, consumable];
+    const [ , savedQty, savedCons ] = found;
 
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${titleCase(equipment)}</td>
       <td style="text-align: center;">
-        <input id="${idCons}" type="checkbox" ${consumable ? "checked" : ""}>
+        <input id="${idCons}" type="checkbox" ${savedCons ? "checked" : ""}>
       </td>
-      <td><input id="${idQty}" type="number" min="0" placeholder="0"></td>
+      <td><input id="${idQty}" type="number" min="0" placeholder="0" value="${savedQty}"></td>
     `;
     tbody.appendChild(row);
     inputs.push([equipment, idQty, idCons]);
