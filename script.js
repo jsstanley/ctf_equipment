@@ -3,6 +3,8 @@ const SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbx4C2dMX4T85zpzH
 /* -------------------------------------------- */
 
 const ctf    = document.getElementById("ctf");
+const savedName = localStorage.getItem("ctf_name");
+if (savedName) ctf.value = savedName;
 const sList  = document.getElementById("sessionList");
 const area   = document.getElementById("formArea");
 const saveBt = document.getElementById("save");
@@ -119,7 +121,10 @@ function buildForm(sess) {
 }
 
 /* Enable Save button only when name entered and inputs exist */
-ctf.addEventListener("input", checkReady);
+ctf.addEventListener("input", () => {
+  localStorage.setItem("ctf_name", ctf.value);
+  checkReady();
+});
 
 saveBt.addEventListener("click", () => {
   if (!ready()) return alert("Enter your name first.");
