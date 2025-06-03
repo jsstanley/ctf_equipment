@@ -97,6 +97,24 @@ function buildForm(sess) {
   });
 
   area.appendChild(table);
+
+  // Auto-save on any change in quantity or consumable checkbox
+  inputs.forEach(([equipName, qtyId, consId]) => {
+    const qtyEl = document.getElementById(qtyId);
+    const consEl = document.getElementById(consId);
+    const saveCurrentSession = () => {
+      const data = inputs.map(([e, qId, cId]) => [
+        e,
+        Number(document.getElementById(qId).value) || 0,
+        document.getElementById(cId).checked
+      ]);
+      storedResponses[current] = data;
+      localStorage.setItem("ctf_responses", JSON.stringify(storedResponses));
+    };
+    qtyEl.addEventListener("input", saveCurrentSession);
+    consEl.addEventListener("change", saveCurrentSession);
+  });
+
   checkReady();
 }
 
