@@ -6,6 +6,7 @@ const ctf    = document.getElementById("ctf");
 const sList  = document.getElementById("sessionList");
 const area   = document.getElementById("formArea");
 const saveBt = document.getElementById("save");
+const submitBt = document.getElementById("submitAll");
 const overlay= document.getElementById("overlay");
 
 let equip = {}, inputs = [], current = null;
@@ -23,10 +24,10 @@ fetch("session_equipment.json")
       sList.appendChild(li);
     });
     current = localStorage.getItem("current_session") || Object.keys(equip)[0];
-    buildForm(current);
     document.querySelectorAll("#sessionList li").forEach(li => {
       li.classList.toggle("active", li.dataset.sess === current);
     });
+    buildForm(current);
 
     sList.addEventListener("click", (e) => {
       const li = e.target.closest("li");
@@ -38,10 +39,7 @@ fetch("session_equipment.json")
     });
   });
 
-
-// Navigation click handler removed to disable session switching via clicks
-
-/* Build numeric inputs for a session */
+/* Build table with Equipment | Consumable | Quantity for a session */
 function buildForm(sess) {
   inputs = [];
   document.getElementById("sessionTitle").textContent = sess;
@@ -50,94 +48,74 @@ function buildForm(sess) {
   const table = document.createElement("table");
   table.className = "equipment-table";
   table.innerHTML = `
-    <thead><tr><th>Equipment</th><th>Quantity</th></tr></thead>
+    <thead>
+      <tr>
+        <th>Equipment</th>
+        <th>Consumable?</th>
+        <th>Quantity</th>
+      </tr>
+    </thead>
     <tbody></tbody>
   `;
   const tbody = table.querySelector("tbody");
 
-  (equip[sess] || []).forEach(item => {
-    const id = "q_" + btoa(item).slice(0, 6);
+  (equip[sess] || []).forEach(itemObj => {
+    const { equipment, consumable } = itemObj;
+    const idQty  = "qt_" + btoa(equipment).slice(0, 6);
+    const idCons = "cs_" + btoa(equipment).slice(0, 6);
+
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${titleCase(item)}</td>
-      <td><input id="${id}" type="number" min="0"></td>
+      <td>${titleCase(equipment)}</td>
+      <td style="text-align: center;">
+        <input id="${idCons}" type="checkbox" ${consumable ? "checked" : ""}>
+      </td>
+      <td><input id="${idQty}" type="number" min="0" placeholder="0"></td>
     `;
     tbody.appendChild(row);
-    inputs.push([item, id]);
+    inputs.push([equipment, idQty, idCons]);
   });
 
   area.appendChild(table);
   checkReady();
 }
 
-/* Save button state when name typed */
+/* Enable Save button only when name entered and inputs exist */
 ctf.addEventListener("input", checkReady);
 
-/* Save + auto-advance */
 saveBt.addEventListener("click", () => {
   if (!ready()) return alert("Enter your name first.");
-  const data = inputs.map(([item,id]) => [item, Number(document.getElementById(id).value) || 0]);
+
+  const data = inputs.map(([equipName, qtyId, consId]) => {
+    const quantity = Number(document.getElementById(qtyId).value) || 0;
+    const isConsumable = document.getElementById(consId).checked;
+    return [equipName, quantity, isConsumable];
+  });
+
   storedResponses[current] = data;
   localStorage.setItem("ctf_responses", JSON.stringify(storedResponses));
+
   markDone(current);
   const next = nextIncomplete();
   if (next) switchSession(next);
   else {
     alert("All sessions completed. Please submit all responses.");
-    document.getElementById("submitAll").disabled = false;
+    submitBt.disabled = false;
   }
 });
 
-/* Helpers -------------------------------------------------------------- */
-function checkReady() {
-  saveBt.disabled = !(ctf.value.trim() && inputs.length);
-}
-
-function ready(){ return ctf.value.trim() && inputs.length; }
-
-function titleCase(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
-
-function switchSession(sess){
-  current = sess;
-  localStorage.setItem("current_session", sess);
-  document.querySelectorAll("#sessionList li").forEach(li => {
-    li.classList.toggle("active", li.dataset.sess === sess);
-  });
-  buildForm(sess);
-}
-
-function markDone(sess){
-  const li = [...sList.children].find(li => li.dataset.sess === sess);
-  if (li){
-    li.classList.add("done");
-    li.classList.remove("active");
-  }
-
-  const next = nextIncomplete();
-  document.querySelectorAll("nav li").forEach(li => li.classList.remove("active"));
-  const nextLi = [...sList.children].find(li => li.dataset.sess === next);
-  if (nextLi){
-    nextLi.classList.add("active");
-  }
-}
-
-function nextIncomplete(){
-  const list = [...sList.children];
-  const idx  = list.findIndex(li=>li.dataset.sess===current);
-  for (let i=idx+1;i<list.length;i++) if(!list[i].classList.contains("done")) return list[i].dataset.sess;
-  for (let i=0;i<idx;i++) if(!list[i].classList.contains("done")) return list[i].dataset.sess;
-  return null;
-}
-
-document.getElementById("submitAll").addEventListener("click", () => {
+/* Submit all stored responses to Google Sheet */
+submitBt.addEventListener("click", () => {
   overlay.classList.add("show");
   const rows = [];
-  Object.entries(storedResponses).forEach(([sess, data]) => {
-    data.forEach(([item, quantity]) => {
+
+  Object.entries(storedResponses).forEach(([sess, dataArr]) => {
+    dataArr.forEach(([equipName, quantity, consumable]) => {
       rows.push({
         name: ctf.value.trim(),
         session: sess,
-        equipment: item,
+        equipment: equipName,
+        consumable: consumable,
         quantity: quantity
       });
     });
@@ -151,10 +129,52 @@ document.getElementById("submitAll").addEventListener("click", () => {
     overlay.classList.remove("show");
     alert("All responses submitted!");
     localStorage.removeItem("ctf_responses");
-    document.getElementById("submitAll").disabled = true;
+    submitBt.disabled = true;
   }).catch(err => {
     console.error(err);
     overlay.classList.remove("show");
     alert("Submission failed. Try again.");
   });
 });
+
+/* Helpers */
+function checkReady() {
+  saveBt.disabled = !(ctf.value.trim() && inputs.length);
+}
+
+function ready() {
+  return ctf.value.trim() && inputs.length;
+}
+
+function titleCase(s) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function switchSession(sess) {
+  current = sess;
+  localStorage.setItem("current_session", sess);
+  document.querySelectorAll("#sessionList li").forEach(li => {
+    li.classList.toggle("active", li.dataset.sess === sess);
+  });
+  buildForm(sess);
+}
+
+function markDone(sess) {
+  const li = [...sList.children].find(li => li.dataset.sess === sess);
+  if (li) {
+    li.classList.add("done");
+    li.classList.remove("active");
+  }
+}
+
+function nextIncomplete() {
+  const list = [...sList.children];
+  const idx  = list.findIndex(li => li.dataset.sess === current);
+  for (let i = idx + 1; i < list.length; i++) {
+    if (!list[i].classList.contains("done")) return list[i].dataset.sess;
+  }
+  for (let i = 0; i < idx; i++) {
+    if (!list[i].classList.contains("done")) return list[i].dataset.sess;
+  }
+  return null;
+}
