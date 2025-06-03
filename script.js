@@ -191,6 +191,8 @@ function titleCase(s) {
 function switchSession(sess) {
   current = sess;
   localStorage.setItem("current_session", sess);
+  // Reload storedResponses from localStorage in case it changed
+  storedResponses = JSON.parse(localStorage.getItem("ctf_responses") || "{}");
   document.querySelectorAll("#sessionList li").forEach(li => {
     li.classList.toggle("active", li.dataset.sess === sess);
   });
