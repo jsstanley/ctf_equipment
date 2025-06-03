@@ -18,7 +18,7 @@
       --radius: .5rem;
       --shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
-  
+
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -26,7 +26,7 @@
       background: var(--bg);
       color: var(--fg);
     }
-  
+
     header {
       padding: 1.2rem 2rem;
       border-bottom: 1px solid var(--border);
@@ -39,13 +39,13 @@
       font-weight: 600;
       color: var(--fg);
     }
-  
+
     main {
       display: flex;
       height: calc(100vh - 66px);
       overflow: hidden;
     }
-  
+
     aside {
       width: 18rem;
       border-right: 1px solid var(--border);
@@ -86,14 +86,14 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
     }
-  
+
     section {
       flex: 1;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
     }
-  
+
     #sessionTitle {
       position: sticky;
       top: 0;
@@ -104,13 +104,13 @@
       border-bottom: 1px solid var(--border);
       z-index: 10;
     }
-  
+
     #formArea {
       padding: 1rem 2rem 0;
     }
-  
+
     button {
-      margin: 1.5rem 2rem;
+      margin: 1.5rem 2rem 0 2rem;
       align-self: flex-start;
       padding: .55rem 1.2rem;
       border: none;
@@ -121,19 +121,17 @@
       cursor: pointer;
       box-shadow: var(--shadow);
     }
-  
+
     button:disabled {
       opacity: .45;
       cursor: not-allowed;
     }
-  
+
     table.equipment-table {
       width: 100%;
       max-width: 600px;
       border-collapse: collapse;
       margin-top: 1rem;
-    }
-    .equipment-table {
       display: table;
     }
 
@@ -152,42 +150,28 @@
     .equipment-table th,
     .equipment-table td {
       display: table-cell;
-    }
-  
-    .equipment-table th,
-    .equipment-table td {
       padding: 0.5rem 0.6rem;
       border-bottom: 1px solid var(--border);
       vertical-align: middle;
+      text-align: left;
     }
-  
+
     .equipment-table th {
       background: #2a2a3b;
       color: var(--fg);
-      text-align: left;
       position: sticky;
       top: 2.8rem;
       z-index: 9;
     }
-  
+
     .equipment-table td {
       background: var(--bg);
     }
-  
+
     .equipment-table tr:nth-child(even) td {
       background-color: var(--row-alt);
     }
-  
-    .equipment-table td:first-child {
-      width: 70%;
-      text-align: left;
-    }
-  
-    .equipment-table td:last-child {
-      width: 30%;
-      text-align: left;
-    }
-  
+
     .equipment-table input[type="number"] {
       width: 5rem;
       text-align: left;
@@ -197,7 +181,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
     }
-  
+
     .overlay {
       position: fixed;
       inset: 0;
@@ -207,11 +191,11 @@
       justify-content: center;
       z-index: 999;
     }
-  
+
     .overlay.show {
       display: flex;
     }
-  
+
     .spinner {
       width: 64px;
       height: 64px;
@@ -220,7 +204,7 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
-  
+
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
@@ -243,6 +227,7 @@
       <div id="sessionTitle" class="sticky-title"></div>
       <div id="formArea"></div>
       <button id="save" disabled>Save &amp; Next</button>
+      <button id="submitAll" disabled>Submit All</button>
     </section>
   </main>
 
