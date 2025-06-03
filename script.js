@@ -167,6 +167,7 @@ submitBt.addEventListener("click", () => {
 
   fetch(SHEET_ENDPOINT, {
     method: "POST",
+    mode: "no-cors",
     body: JSON.stringify(rows),
     headers: { "Content-Type": "application/json" }
   }).then(() => {
