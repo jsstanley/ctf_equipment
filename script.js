@@ -26,11 +26,8 @@ fetch("session_equipment.json")
     buildForm(current);
   });
 
-/* Navigation click handler */
-sList.addEventListener("click", e => {
-  if (e.target.tagName !== "LI") return;
-  switchSession(e.target.dataset.sess);
-});
+
+// Navigation click handler removed to disable session switching via clicks
 
 /* Build numeric inputs for a session */
 function buildForm(sess) {
@@ -102,8 +99,18 @@ function switchSession(sess){
 }
 
 function markDone(sess){
-  const li = [...sList.children].find(li=>li.dataset.sess===sess);
-  if (li){ li.classList.add("done"); li.classList.remove("active"); }
+  const li = [...sList.children].find(li => li.dataset.sess === sess);
+  if (li){
+    li.classList.add("done");
+    li.classList.remove("active");
+  }
+
+  const next = nextIncomplete();
+  document.querySelectorAll("nav li").forEach(li => li.classList.remove("active"));
+  const nextLi = [...sList.children].find(li => li.dataset.sess === next);
+  if (nextLi){
+    nextLi.classList.add("active");
+  }
 }
 
 function nextIncomplete(){
