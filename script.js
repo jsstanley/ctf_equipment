@@ -34,16 +34,30 @@ sList.addEventListener("click", e => {
 
 /* Build numeric inputs for a session */
 function buildForm(sess) {
-  area.innerHTML = "";
   inputs = [];
+  document.getElementById("sessionTitle").textContent = sess;
+  area.innerHTML = "";
+
+  const table = document.createElement("table");
+  table.className = "equipment-table";
+  table.innerHTML = `
+    <thead><tr><th>Equipment</th><th>Quantity</th></tr></thead>
+    <tbody></tbody>
+  `;
+  const tbody = table.querySelector("tbody");
+
   (equip[sess] || []).forEach(item => {
-    const id = "q_"+btoa(item).slice(0,6);
-    const row = document.createElement("label");
-    row.innerHTML = `<span>${titleCase(item)}</span>
-                     <input id="${id}" type="number" min="0">`;
-    area.appendChild(row);
-    inputs.push([item,id]);
+    const id = "q_" + btoa(item).slice(0, 6);
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${titleCase(item)}</td>
+      <td><input id="${id}" type="number" min="0"></td>
+    `;
+    tbody.appendChild(row);
+    inputs.push([item, id]);
   });
+
+  area.appendChild(table);
   checkReady();
 }
 

@@ -1,70 +1,227 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <title>CTF Equipment Quantities</title>
 
-  <!-- --- minimal, modern look ----------------- -->
+  <!-- Minimal, modern styling -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f9fafb; --fg: #111; --accent: #2563eb;
-      --border: #e5e7eb; --radius: .5rem; --shadow: 0 2px 4px rgb(0 0 0 / .05);
+      --bg: #1e1e2f;
+      --fg: #e2e2e2;
+      --accent: #4f8cff;
+      --border: #3b3b4f;
+      --row-alt: #262637;
+      --input-bg: #2a2a3b;
+      --radius: .5rem;
+      --shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
-    *{box-sizing:border-box} body{margin:0;font:16px/1.45 "Inter",sans-serif;background:var(--bg);color:var(--fg)}
-    header{padding:1.2rem 2rem;border-bottom:1px solid var(--border);background:#fff;box-shadow:var(--shadow)}
-    h1{margin:0;font-size:1.25rem;font-weight:600}
-    main{display:flex;min-height:calc(100vh - 66px)}
-    nav{width:18rem;border-right:1px solid var(--border);overflow-y:auto;background:#fff}
-    nav ul{margin:0;padding:0;list-style:none}
-    nav li{padding:.75rem 1.25rem;cursor:pointer;border-bottom:1px solid var(--border)}
-    nav li.active{background:var(--accent);color:#fff;font-weight:600}
-    nav li.done::after{content:"✓";float:right;font-weight:600}
-    section{flex:1;padding:2rem;display:flex;flex-direction:column;gap:1.2rem}
-    label {
+  
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 16px/1.45 "Inter", sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+    }
+  
+    header {
+      padding: 1.2rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: #2a2a3b;
+      box-shadow: var(--shadow);
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--fg);
+    }
+  
+    main {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.25rem 0;
+      height: calc(100vh - 66px);
+      overflow: hidden;
     }
-    label span {
-      flex: 1.4;
-      text-align: left;
+  
+    aside {
+      width: 18rem;
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      background: #232334;
     }
-    input[type="number"] {
-      flex: 0.4;
-      max-width: 6rem;
-      text-align: right;
-      padding: .35rem .5rem;
+    aside ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    aside li {
+      padding: .75rem 1.25rem;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      color: var(--fg);
+    }
+    aside li.active {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+    }
+    aside li.done::after {
+      content: "✓";
+      float: right;
+      font-weight: 600;
+    }
+    aside label {
+      padding: 1rem 1.25rem;
+      display: block;
+    }
+    aside input[type="text"] {
+      width: 100%;
+      padding: .5rem;
+      margin-top: .5rem;
+      background: var(--input-bg);
+      color: var(--fg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
     }
-    input[type="text"]{width:20rem;padding:.5rem;border:1px solid var(--border);border-radius:var(--radius)}
-    button{align-self:flex-start;padding:.55rem 1.2rem;border:none;border-radius:var(--radius);background:var(--accent);color:#fff;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
-    button:disabled{opacity:.45;cursor:not-allowed}
-    /* spinner overlay */
-    .overlay{position:fixed;inset:0;background:rgba(255,255,255,.6);display:none;align-items:center;justify-content:center;z-index:999}
-    .overlay.show{display:flex}
-    .spinner{width:64px;height:64px;border:8px solid #ddd;border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
+  
+    section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+  
+    #sessionTitle {
+      position: sticky;
+      top: 0;
+      background: #2a2a3b;
+      padding: 1rem 2rem 0.5rem;
+      font-weight: 600;
+      font-size: 1.2rem;
+      border-bottom: 1px solid var(--border);
+      z-index: 10;
+    }
+  
+    #formArea {
+      padding: 1rem 2rem 0;
+    }
+  
+    button {
+      margin: 1.5rem 2rem;
+      align-self: flex-start;
+      padding: .55rem 1.2rem;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+  
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+  
+    table.equipment-table {
+      width: 100%;
+      max-width: 600px;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+  
+    .equipment-table th,
+    .equipment-table td {
+      padding: 0.5rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+  
+    .equipment-table th {
+      background: #2a2a3b;
+      color: var(--fg);
+      text-align: left;
+      position: sticky;
+      top: 2.8rem;
+      z-index: 9;
+    }
+  
+    .equipment-table td {
+      background: var(--bg);
+    }
+  
+    .equipment-table tr:nth-child(even) td {
+      background-color: var(--row-alt);
+    }
+  
+    .equipment-table td:first-child {
+      width: 70%;
+      text-align: left;
+    }
+  
+    .equipment-table td:last-child {
+      width: 30%;
+      text-align: left;
+    }
+  
+    .equipment-table input[type="number"] {
+      width: 5rem;
+      text-align: left;
+      padding: 0.35rem 0.4rem;
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+  
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+  
+    .overlay.show {
+      display: flex;
+    }
+  
+    .spinner {
+      width: 64px;
+      height: 64px;
+      border: 8px solid #555;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+  
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
+
 <body>
-  <header><h1>CTF Equipment Quantities</h1></header>
+  <header><h1>Estimating equipment quantities for CTF sessions</h1></header>
 
   <main>
-    <nav><ul id="sessionList"></ul></nav>
+    <aside>
+      <label>
+        <strong>Your name</strong><br>
+        <input id="ctf" type="text" placeholder="Type your name here">
+      </label>
+      <ul id="sessionList"></ul>
+    </aside>
 
     <section>
-      <label>
-        <span>Your name</span>
-        <input id="ctf" type="text" placeholder="Type full name">
-      </label>
-
+      <div id="sessionTitle" class="sticky-title"></div>
       <div id="formArea"></div>
-
       <button id="save" disabled>Save &amp; Next</button>
     </section>
   </main>
