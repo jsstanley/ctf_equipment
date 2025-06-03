@@ -1,22 +1,60 @@
-<!doctype html><html lang="en">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"><title>CTF Equipment Quantities</title>
-  <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
-  <style>label>input{max-width:6rem}</style>
+  <meta charset="utf-8">
+  <title>CTF Equipment Quantities</title>
+
+  <!-- --- minimal, modern look ----------------- -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f9fafb; --fg: #111; --accent: #2563eb;
+      --border: #e5e7eb; --radius: .5rem; --shadow: 0 2px 4px rgb(0 0 0 / .05);
+    }
+    *{box-sizing:border-box} body{margin:0;font:16px/1.45 "Inter",sans-serif;background:var(--bg);color:var(--fg)}
+    header{padding:1.2rem 2rem;border-bottom:1px solid var(--border);background:#fff;box-shadow:var(--shadow)}
+    h1{margin:0;font-size:1.25rem;font-weight:600}
+    main{display:flex;min-height:calc(100vh - 66px)}
+    nav{width:18rem;border-right:1px solid var(--border);overflow-y:auto;background:#fff}
+    nav ul{margin:0;padding:0;list-style:none}
+    nav li{padding:.75rem 1.25rem;cursor:pointer;border-bottom:1px solid var(--border)}
+    nav li.active{background:var(--accent);color:#fff;font-weight:600}
+    nav li.done::after{content:"✓";float:right;font-weight:600}
+    section{flex:1;padding:2rem;display:flex;flex-direction:column;gap:1.2rem}
+    label{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+    label span{flex:1;text-align:left}
+    input[type="number"]{max-width:6rem;text-align:right;padding:.35rem .5rem;border:1px solid var(--border);border-radius:var(--radius)}
+    input[type="text"]{width:20rem;padding:.5rem;border:1px solid var(--border);border-radius:var(--radius)}
+    button{align-self:flex-start;padding:.55rem 1.2rem;border:none;border-radius:var(--radius);background:var(--accent);color:#fff;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    /* spinner overlay */
+    .overlay{position:fixed;inset:0;background:rgba(255,255,255,.6);display:none;align-items:center;justify-content:center;z-index:999}
+    .overlay.show{display:flex}
+    .spinner{width:64px;height:64px;border:8px solid #ddd;border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
 </head>
 <body>
-<h1>Enter session quantities</h1>
+  <header><h1>CTF Equipment Quantities</h1></header>
 
-<label>Your name
-  <input id="ctf" type="text" placeholder="Type your full name">
-</label>
+  <main>
+    <nav><ul id="sessionList"></ul></nav>
 
-<label>Session
-  <select id="session"><option hidden value="">Choose…</option></select>
-</label>
+    <section>
+      <label>
+        <span>Your name</span>
+        <input id="ctf" type="text" placeholder="Type full name">
+      </label>
 
-<form id="formArea"></form>
-<button id="send" disabled>Save</button>
+      <div id="formArea"></div>
 
-<script src="script.js"></script>
-</body></html>
+      <button id="save" disabled>Save &amp; Next</button>
+    </section>
+  </main>
+
+  <div class="overlay" id="overlay"><div class="spinner"></div></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
