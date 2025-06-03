@@ -44,11 +44,11 @@ function buildForm(sess) {
     area.appendChild(row);
     inputs.push([item,id]);
   });
-  saveBt.disabled = !(ctf.value.trim() && inputs.length);
+  checkReady();
 }
 
 /* Save button state when name typed */
-ctf.addEventListener("input", () => saveBt.disabled = !ready());
+ctf.addEventListener("input", checkReady);
 
 /* Save + auto-advance */
 saveBt.addEventListener("click", () => {
@@ -71,6 +71,10 @@ saveBt.addEventListener("click", () => {
 });
 
 /* Helpers -------------------------------------------------------------- */
+function checkReady() {
+  saveBt.disabled = !(ctf.value.trim() && inputs.length);
+}
+
 function ready(){ return ctf.value.trim() && inputs.length; }
 
 function titleCase(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
